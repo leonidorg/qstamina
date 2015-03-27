@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/images">
+        <file alias="icon">resources/icons/64/qstamina.png</file>
+    </qresource>
+    <qresource prefix="/">
+        <file>resources/generatorRules/ru_RU.rnd</file>
+        <file>resources/generatorRules/en_US.rnd</file>
+    </qresource>
+</RCC>
