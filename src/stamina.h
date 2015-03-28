@@ -52,7 +52,7 @@
 #include "sounds.h"
 #include "markchain.h"
 #include "myinlinefield.h"
-
+#include "lessontimer.h"
 namespace Ui {
 class Stamina;
 }
