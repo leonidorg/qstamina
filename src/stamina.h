@@ -100,9 +100,10 @@ private:
     int m_currentNumberOfGroup;
     QList<int> m_speedBySecond;
     QList<float> m_avgSpeedBySecond;
-    int  _timeLesson;
+    int  m_timeLesson;
+    LessonTimer *m_lessonTimer;
 private slots:
-    int timeLesson() const {return _timeLesson;}
+    int timeLesson() const {return m_timeLesson;}
     void lessonChoosed();
     void generatedlessonChoosed();
     void layoutChoosed();

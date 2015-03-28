@@ -28,6 +28,9 @@ Stamina::Stamina(QWidget *parent) :
     ui->setupUi(this);
 
     m_config = new Config;
+    m_lessonTimer= new LessonTimer(1000);
+    m_timeLesson=/*m_config->lessonTime()*/120;
+
     m_sounds = new Sounds( m_config );
     m_chain = new Markchain(this);
     m_currentGroup=m_config->lastGroup();
@@ -322,6 +325,14 @@ void Stamina::timeout()
     time.setHMS(0,0,0,0);
     time = time.addSecs(m_time);
     ui->lblTimer->setText(time.toString("hh:mm:ss"));
+
+
+    qDebug()<<"прошло<:"<<m_lessonTimer->clearTime()<<"oсталось"<<(m_timeLesson - m_lessonTimer->clearTime());
+    if(m_lessonTimer->clearTime()>=m_timeLesson)
+    {    m_sounds->play("Success");
+         qDebug()<<"the time!";
+        on_pushButton_released();
+    }
 }
 
 void Stamina::loadLayoutMenu()
@@ -432,6 +443,7 @@ void Stamina::on_pushButton_released()
             m_textfield->start();
             ui->pushButton->setText(tr("Stop"));
             m_timer->start(1000);
+             m_lessonTimer->start();
             m_keyboard->updateKeyboard(m_textfield->nextSymbol());
 
            }
