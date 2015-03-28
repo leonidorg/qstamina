@@ -235,8 +235,7 @@ void Stamina::generatedlessonChoosed()
     QAction *action = (QAction*)sender();
     qDebug()<<"generatedlessonChoosed:"<<action->data().toString();
     loadLesson( action->data().value<Lesson*>() );
-    action->data().
-}
+   }
 
 void Stamina::layoutChoosed()
 {
