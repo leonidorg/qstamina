@@ -5,5 +5,15 @@
     <qresource prefix="/">
         <file>resources/generatorRules/ru_RU.rnd</file>
         <file>resources/generatorRules/en_US.rnd</file>
+        <file>resources/sounds/type.wav</file>
+        <file>resources/sounds/Metronome.wav</file>
+        <file>resources/sounds/Success.wav</file>
+        <file>resources/sounds/error.wav</file>
+        <file>resources/sounds/Error.wav</file>
+        <file>resources/sounds/Switch.wav</file>
+        <file>resources/sounds/Ow_Female.wav</file>
+        <file>resources/sounds/Ow_Vinni.wav</file>
+        <file>resources/sounds/Click.wav</file>
+        <file>resources/sounds/finish.wav</file>
     </qresource>
 </RCC>

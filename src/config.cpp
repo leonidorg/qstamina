@@ -19,6 +19,11 @@ Config::~Config()
 {
 
 }
+double Config::volume()
+{
+    return 0.5;
+}
+
 QString Config::lastLayoutFile() const
 {
     return m_lastLayoutFile;

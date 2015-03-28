@@ -42,7 +42,8 @@ SOURCES += main.cpp\
     sounds.cpp \
     markchain.cpp \
     intlist.cpp \
-    myinlinefield.cpp
+    myinlinefield.cpp \
+    lessontimer.cpp
 
 HEADERS  += stamina.h \
     results.h \
@@ -57,7 +58,8 @@ HEADERS  += stamina.h \
     sounds.h \
     markchain.h \
     intlist.h \
-    myinlinefield.h
+    myinlinefield.h \
+    lessontimer.h
 
 FORMS    += stamina.ui \
     results.ui \
@@ -166,3 +168,5 @@ unix : !macx :{
     icon512.path = $$DATADIR/icons/hicolor/512x512/apps
     icon512.files += resources/icons/512/qstamina.png
 }
+
+DISTFILES +=

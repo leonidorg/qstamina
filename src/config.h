@@ -37,7 +37,7 @@ public:
 
     int fontSize() const;
     void setFontSize(int fontSize);
-
+    double volume();
     bool separateKeyboard() const;
     bool enableSound() const;
     void setSeparateKeyboard(bool separateKeyboard);
