@@ -99,7 +99,7 @@ QString Markchain::chapper(QString start, int length,bool isAdvanced)
         QString result;
         result.clear();
          QMap<QChar, QStringList>::const_iterator it ;
-        qDebug()<<"первый элем="<<key;
+        qDebug()<<"первый элем="<<start<<"vs"<<key;
         do
         {   it = m_store.find(key);
             if (it== m_store.end())
