@@ -24,7 +24,10 @@ TextField::TextField(Sounds *sounds, QWidget *parent) :
     m_sounds( sounds )
 {
 }
-
+QString TextField::lastSymbol()
+{
+return "";
+}
 void TextField::keyPressed(QString)
 {
 }

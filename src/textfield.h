@@ -22,7 +22,7 @@
 
 #include <QWidget>
 #include <QDebug>
-
+//#include <QLabel>
 #include "sounds.h"
 
 class TextField : public QWidget
@@ -33,12 +33,14 @@ public:
     virtual void keyPressed(QString);
     virtual void setText(QString);
     virtual QString nextSymbol();
+    virtual QString lastSymbol();
     virtual void reset();
     virtual void start();
     virtual void stop();
     int rightSymbols();
     int countSymbols();
     int wrongSymbols();
+
 
     virtual void setFontPixelSize(int);
 protected:

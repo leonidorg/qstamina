@@ -51,6 +51,7 @@
 #include "inlinefield.h"
 #include "sounds.h"
 #include "markchain.h"
+#include "myinlinefield.h"
 
 namespace Ui {
 class Stamina;
