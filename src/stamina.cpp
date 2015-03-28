@@ -57,9 +57,10 @@ qDebug()<<"savedgroup="<<m_currentGroup<<"savedNumber="<<m_currentNumberOfLesson
     connect(m_textfield,SIGNAL(noMoreText()),this,SLOT(getMoreText()));
 
     m_textfield->setFontPixelSize(m_config->fontSize());
-
-    m_timer = new QTimer();
+    m_timer =new QTimer;
+    run_timer = new QTimer();
     connect(m_timer,SIGNAL(timeout()),this,SLOT(timeout()));
+    connect(run_timer,SIGNAL(timeout()),this,SLOT(runStep()));
     m_time = 0;
     m_typeLastSecond = 0;
     m_speed = 0;
@@ -109,6 +110,7 @@ qDebug()<<"savedgroup="<<m_currentGroup<<"savedNumber="<<m_currentNumberOfLesson
 
     loadLayoutMenu();
     loadCurrentLayout();
+    ui->pushButton->setFocus();
 }
 
 Stamina::~Stamina()
@@ -120,7 +122,8 @@ void Stamina::keyPressEvent(QKeyEvent *event)
 {
     //qDebug()<<event->text();
     if( m_lessonStarted )
-    {
+    {   m_freqPress=0;
+        ui->radioButton->setChecked(true);
         if( event->key() == Qt::Key_Escape )
             //this->endLesson();
             on_pushButton_released();
@@ -181,6 +184,9 @@ void Stamina::loadLessonsMenu()
 
 void Stamina::loadLesson(Lesson *lesson)
 {
+    ui->radioButton->setChecked(true);
+     if (!ui->radioButton->isChecked())
+                        ui->radioButton->setChecked(true);//снятие паузы, если она была установлена}
 
     //    if( m_lessonStarted )
     //        this->endLesson();
@@ -249,10 +255,14 @@ void Stamina::loadCurrentLayout()
 
 void Stamina::endLesson()
 {
+    ui->radioButton->setChecked(true);
+    ui->pushButton->setFocus();
+
     m_lessonStarted = false;
     m_textfield->stop();
     ui->pushButton->setText(tr("Start"));
     m_timer->stop();
+    run_timer->stop();
     QTime time;
     time.setHMS(0,0,0,0);
     time = time.addSecs(m_time);
@@ -282,6 +292,8 @@ void Stamina::endLesson()
     m_speedBySecond.clear();
     resultsDialog->show();
     resultsDialog->setFixedSize(resultsDialog->size());
+    ui->radioButton->setChecked(true);
+    pushClick();
 }
 
 void Stamina::lessonChoosed()
@@ -312,6 +324,11 @@ void Stamina::layoutChoosed()
 
 void Stamina::timeout()
 {
+    bool out;
+    out= (!ui->lblTimer->isActiveWindow())||(m_freqPress>PAUSECONST);
+    if(m_lessonStarted) ui->radioButton->setChecked(!out);
+    if (!ui->radioButton->isChecked())return;
+
     m_time++;
     m_speed = m_textfield->rightSymbols() / m_time * 60;
 
@@ -331,7 +348,8 @@ void Stamina::timeout()
     if(m_lessonTimer->clearTime()>=m_timeLesson)
     {    m_sounds->play("Success");
          qDebug()<<"the time!";
-        on_pushButton_released();
+        //on_pushButton_released();
+        pushClick();
     }
 }
 
@@ -417,15 +435,39 @@ void Stamina::getMoreText()
 {
     if(m_currentGroup=="random")
     {
-        qDebug()<<"++++++++++++++++++++++++++++++++++++++++++++++"<<m_currentGroup<<m_currentNumberOfLesson;
+        //qDebug()<<"++++++++++++++++++++++++++++++++++++++++++++++"<<m_currentGroup<<m_currentNumberOfLesson;
         createRandomLesson(m_currentNumberOfLesson);
         ui->pushButton->clearFocus();
+        ui->radioButton->setFocus();
     }
         else
     {
-        qDebug()<<"-------------------------------------------"<<m_currentGroup<<m_currentNumberOfLesson;
-        on_pushButton_released();
+        //qDebug()<<"-------------------------------------------"<<m_currentGroup<<m_currentNumberOfLesson;
+        //on_pushButton_released();
+        pushClick();
      }
+}
+void Stamina::runStep()
+{
+
+    if( m_lessonStarted )
+       {
+           m_freqPress++;
+           if(m_freqPress>PAUSECONST)
+                          ui->radioButton->setChecked(false);
+       }
+
+       if (!ui->radioButton->isChecked())return;//во время паузы -пауза бегущей строки и звука метронома.
+
+    if(m_config->enableTikTak())//молчание по запрету настроек
+       m_sounds->play("metronome");
+}
+void Stamina::pushClick()
+{
+       ui->pushButton->setFocus();
+       ui->pushButton->click();
+       ui->pushButton->clearFocus();
+       ui->lblTimer->setFocus();
 }
 
 void Stamina::on_pushButton_released()
@@ -435,7 +477,8 @@ void Stamina::on_pushButton_released()
     if( m_lessonStarted )
     {
         this->endLesson();
-    } else {
+    } else
+    {
         if( m_lessonLoaded )
         {
           {
@@ -443,14 +486,18 @@ void Stamina::on_pushButton_released()
             m_textfield->start();
             ui->pushButton->setText(tr("Stop"));
             m_timer->start(1000);
-             m_lessonTimer->start();
+            run_timer->start(m_config->interval());
+            "Время пошло!";
+            m_lessonTimer->start();
             m_keyboard->updateKeyboard(m_textfield->nextSymbol());
 
            }
 
         }
+        ui->pushButton->clearFocus();
+        ui->lblTimer->setFocus();
     }
-   ui->pushButton->clearFocus();
+
 }
 
 void Stamina::aboutTriggered()
@@ -486,3 +533,13 @@ void Stamina::generatorTriggered()
         loadGeneratedLessons();
     }
 }
+
+void Stamina::on_radioButton_toggled(bool checked)
+{
+    ui->pause_Label->setVisible(!checked);
+}
+
+void Stamina::on_radioButton_released()
+{
+    ui->radioButton->clearFocus();
+ }
