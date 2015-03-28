@@ -50,7 +50,10 @@ public:
 
     Layout *currentLayout() const;
     bool setCurrentLayout(const int layoutIndex);
-
+    Lesson * getLastLesson(QString group,int number);
+    QString lastGroup() const{return m_lastGroup;}
+    int lastNumber() const{return m_lastNumber;}
+    void setLastLesson(QString group,int number);
     QList<Layout *> layouts() const;
     LessonsList lessons() const;
     QList<Lesson *> generatedLessons() const;
@@ -63,9 +66,10 @@ private:
     int m_fontSize;
     bool m_separateKeyboard;
     bool m_enableSound;
-
     QList<Layout*> m_layouts;
     Layout *m_currentLayout;
+    QString m_lastGroup;
+    int m_lastNumber;
 
     LessonsList m_lessons;
     QList<Lesson*> m_generatedLessons;

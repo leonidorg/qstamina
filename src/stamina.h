@@ -25,6 +25,7 @@
 #include <QMenu>
 #include <QAction>
 #include <QDir>
+
 #include <QFile>
 #include <QSettings>
 #include <QTimer>
@@ -74,11 +75,8 @@ private:
     QMenu *m_layoutsMenu;
     QMenu *m_generatorMenu;
     SettingsForm *m_settings;
-
     Keyboard *m_keyboard;
-
     TextField *m_textfield;
-
     void keyPressEvent(QKeyEvent * event);
     void loadLessonsMenu();
     void loadLayoutMenu();
@@ -87,7 +85,8 @@ private:
     void loadLesson(Lesson *);
     void loadCurrentLayout();
     void endLesson();
-
+    void createRandomLesson(int isAdvance);
+    void reset();
     float m_time;
     int m_typeLastSecond;
     float m_speed;
@@ -95,7 +94,9 @@ private:
     QMenuBar *m_mainMenu;
     Markchain *m_chain;
     bool m_lessonLoaded;
-
+    QString m_currentGroup;
+    int m_currentNumberOfLesson;
+    int m_currentNumberOfGroup;
     QList<int> m_speedBySecond;
     QList<float> m_avgSpeedBySecond;
 private slots:
@@ -109,6 +110,10 @@ private slots:
     void settingsSaved();
     void generatorTriggered();
     void myRandomLessonChoosed();
+    void myRandomLessonChoosed1();
+    void createTextLesson();
+  public slots:
+    void getMoreText();
 };
 
 #endif // STAMINA_H

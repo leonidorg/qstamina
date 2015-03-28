@@ -12,6 +12,9 @@ struct Lesson {
     QString version;
     QString content;
     QString group;
+    int number;
+
+
 };
 
 class LessonsList

@@ -15,6 +15,7 @@ void LessonsList::append(Lesson *lesson)
         qDebug()<<"Creating new lessons group: "<<lesson->group;
         groupList = new QList<Lesson*>;
         m_groups[lesson->group] = groupList;
+
     }
     groupList->append(lesson);
 }
@@ -73,5 +74,5 @@ QList<Lesson *> LessonsList::lessonsByGroup(const QString &group)
     {
         return QList<Lesson*>();
     }
-    return *groups;
+    return *groups;//чОтко!
 }

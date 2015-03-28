@@ -30,6 +30,10 @@ Stamina::Stamina(QWidget *parent) :
     m_config = new Config;
     m_sounds = new Sounds( m_config );
     m_chain = new Markchain(this);
+    m_currentGroup=m_config->lastGroup();
+    m_currentNumberOfLesson=m_config->lastNumber();
+
+qDebug()<<"savedgroup="<<m_currentGroup<<"savedNumber="<<m_currentNumberOfLesson;
     QDir storage;
     storage.mkpath(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/generatedLessons");
 
@@ -40,7 +44,7 @@ Stamina::Stamina(QWidget *parent) :
     InlineField *inlineField = new InlineField( m_sounds, ui->frameTextField );
     m_textfield = dynamic_cast< TextField* >(inlineField);
     layout->addWidget(m_textfield);
-    connect(m_textfield,SIGNAL(noMoreText()),this,SLOT(on_pushButton_released()));
+    connect(m_textfield,SIGNAL(noMoreText()),this,SLOT(getMoreText()));
 
     m_textfield->setFontPixelSize(m_config->fontSize());
 
@@ -133,18 +137,21 @@ void Stamina::loadLessonsMenu()
     qDebug()<<"Loading lessons menu";
     m_lessonsMenu->clear();
     QAction *action;
-
+    //QMap<QString,int> mGroups;
     QStringList groups = m_config->lessons().groups();
-
-    for( int i = 0; i < groups.count(); i++ )
+        for( int i = 0; i < groups.count(); i++ )
     {
+
+        //mGroups[groups.at(i)]=i;
         QList<Lesson*> lessons = m_config->lessons().lessonsByGroup(groups.at(i));
         QMenu *groupMenu = new QMenu(groups.at(i),m_lessonsMenu);
         for( int q = 0; q < lessons.count(); q++ )
         {
+            Lesson *menuLesson=lessons.at(q);
+            menuLesson->number=q;
             action = groupMenu->addAction(lessons.at(q)->title,this,SLOT(lessonChoosed()));
             QVariant actionData;
-            actionData.setValue(lessons.at(q));
+            actionData.setValue(menuLesson);
             action->setData(actionData);
         }
         if( lessons.count() > 0 )
@@ -158,24 +165,67 @@ void Stamina::loadLessonsMenu()
     //qDebug()<<m_generatorMenu->actions().count();
     m_lessonsMenu->addSeparator();
     m_lessonsMenu->addMenu(m_generatorMenu);
+    m_lessonsMenu->addSeparator();
+    m_lessonsMenu->addAction(tr("Text"),this,SLOT(createTextLesson()));
 }
 
 void Stamina::loadLesson(Lesson *lesson)
 {
-    if( m_lessonStarted )
-        this->endLesson();
 
-    qDebug()<<"loading lesson: "<<lesson->title;
+    //    if( m_lessonStarted )
+    //        this->endLesson();
+    qDebug()<<"loading lesson: group="<<lesson->group<<"["<<lesson->number<<"]"<<lesson->title;
 
     m_textfield->setText(lesson->content);
     ui->lblLesson->setText(lesson->title);
     m_lessonLoaded = true;
+    m_currentGroup =lesson->group;
+    m_currentNumberOfGroup=m_config->lessons().groups().indexOf(m_currentGroup);
+    if(m_currentNumberOfGroup<0)m_currentNumberOfGroup=0;
+    m_currentNumberOfLesson=lesson->number;
+    //сохраняем текущий урок.
+
+    m_config->setLastLesson(m_currentGroup,m_currentNumberOfLesson);
+    qDebug()<<"Save lesson: group<"<<lesson->group<<"["<<m_currentNumberOfGroup<<"]::groupNumber="<<m_currentNumberOfLesson;
+}
+void Stamina::reset()
+{
+
+qDebug()<<"RESET:savedgroup="<<m_currentGroup<<"savedNumber="<<m_currentNumberOfLesson;
+if (m_currentGroup=="random")
+    createRandomLesson(m_currentNumberOfLesson);
+else
+    if(m_currentGroup=="generate")
+{   if(m_currentNumberOfLesson>=0&&m_currentNumberOfLesson<m_config->generatedLessons().size())
+    {
+        Lesson *genLesson=m_config->generatedLessons().at(m_currentNumberOfLesson);
+        genLesson->number=m_currentNumberOfLesson;
+        loadLesson(genLesson);
+     }
+
 }
 
+
+else
+  {
+        m_currentNumberOfGroup=m_config->lessons().groups().indexOf(m_currentGroup);
+        if(m_currentNumberOfGroup<0)
+            m_currentNumberOfLesson=0;
+        Lesson *baseLesson=m_config->getLastLesson(m_currentGroup,m_currentNumberOfLesson);
+        if(baseLesson)
+        {
+            baseLesson->number=m_currentNumberOfLesson;
+            loadLesson(baseLesson);
+        }
+            else
+//           createRandomLesson(m_currentNumberOfLesson);
+          qDebug()<<"group="<<m_currentGroup<<"["<<m_currentNumberOfLesson<<"]"<<"groupNumber="<<m_currentNumberOfGroup<<m_currentGroup;
+    }
+}
 void Stamina::loadCurrentLayout()
-{
-    if( m_lessonStarted )
-        this->endLesson();
+{ qDebug()<<"loadingCurrentLayout";
+//    if( m_lessonStarted )
+//        this->endLesson();
 
     ui->lblLesson->setText("   ");
     m_textfield->setText("");
@@ -183,7 +233,9 @@ void Stamina::loadCurrentLayout()
     m_keyboard->loadKeyboard(m_config->currentLayout()->symbols);
     m_lessonLoaded = false;
     loadLessonsMenu();
-}
+    reset();
+     m_config->setLastLayout(m_config->currentLayout()->name);
+    }
 
 void Stamina::endLesson()
 {
@@ -225,7 +277,8 @@ void Stamina::endLesson()
 void Stamina::lessonChoosed()
 {
     QAction *action = (QAction*)sender();
-    //qDebug()<<action->data().toString();
+    qDebug()<<""
+              "lessonChoosed:"<<action->data().value<Lesson*>()->number;
     loadLesson( action->data().value<Lesson*>() );
 }
 
@@ -233,7 +286,8 @@ void Stamina::generatedlessonChoosed()
 {
 
     QAction *action = (QAction*)sender();
-    qDebug()<<"generatedlessonChoosed:"<<action->data().toString();
+
+    qDebug()<<"generatedlessonChoosed:"<<action->data().value<Lesson*>()->number;
     loadLesson( action->data().value<Lesson*>() );
    }
 
@@ -280,17 +334,43 @@ void Stamina::loadGeneratorMenu()
     m_generatorMenu->clear();
     m_generatorMenu->addAction(tr("Generate"),this,SLOT(generatorTriggered()));
     m_generatorMenu->addSeparator();
+
 }
-void Stamina::myRandomLessonChoosed()
+void Stamina::createTextLesson()
+{
+    createRandomLesson(true);
+    QString bookName;
+    QMessageBox msgBox;
+    if(m_config->lastLayout()=="en_US")
+                bookName="'THE CATCHER IN THE RYE by J. D. SALINGER'";
+            else
+                bookName="'Понедельник начинается в субботу' А. и Б. Стругацких";
+    msgBox.setText(tr("Вам предлагается напечатать текст, основанный на  силлабической структуре произведения: ")+bookName);
+    msgBox.exec();
+
+}
+
+void Stamina::createRandomLesson(int isAdvance)
 {
 
-    qDebug()<<"myRandomLessonChoosed";
-    Lesson *newLesson= new Lesson();
-    newLesson->title="random";
-    newLesson->content=m_chain->chapper(' ',100,true);
-    loadLesson( newLesson );
+        qDebug()<<"myRandomLessonChoosed";
+        Lesson *newLesson= new Lesson();
+        newLesson->title="Random";
+        newLesson->group="random";
+        newLesson->number=isAdvance;//хранит значение сложности.
+        newLesson->content=m_chain->chapper(m_textfield->nextSymbol(),100,isAdvance);
+        loadLesson( newLesson );
+
 }
 
+void Stamina::myRandomLessonChoosed()
+{
+createRandomLesson(0);
+}
+void Stamina::myRandomLessonChoosed1()
+{
+createRandomLesson(1);
+}
 void Stamina::loadGeneratedLessons()
 {
     loadGeneratorMenu();
@@ -299,34 +379,59 @@ void Stamina::loadGeneratedLessons()
     m_chain->load(m_config->currentLayout()->name);
     for( int i = 0; i < m_config->generatedLessons().count(); i++ )
     {
-        qDebug()<<"Lesson: "<<m_config->generatedLessons().at(i)->title<<" added to menu.";
+        qDebug()<<"Lesson: ["<<m_config->generatedLessons().at(i)->number<<"]"<<m_config->generatedLessons().at(i)->title<<" added to menu.";
         action = m_generatorMenu->addAction(m_config->generatedLessons().at(i)->title,this,SLOT(generatedlessonChoosed()));
         QVariant actionData;
-        actionData.setValue(m_config->generatedLessons().at(i));
+        Lesson *menuLesson=m_config->generatedLessons().at(i);
+        menuLesson->number=i;
+        menuLesson->group="generate";
+        actionData.setValue(menuLesson);
         action->setData(actionData);
     }
-    qDebug()<<"Lesson: "<<"Random"<<" added to menu.";
-    action = m_generatorMenu->addAction("Random",this,SLOT(myRandomLessonChoosed()));
+    qDebug()<<"Lesson: "<<tr("Random")<<" added to menu.";
+    m_generatorMenu->addSeparator();
+    action = m_generatorMenu->addAction(tr("Random"),this,SLOT(myRandomLessonChoosed()));
+    action = m_generatorMenu->addAction(tr("Random (advanced)"),this,SLOT(myRandomLessonChoosed1()));
 
 
+}
+void Stamina::getMoreText()
+{
+    if(m_currentGroup=="random")
+    {
+        qDebug()<<"++++++++++++++++++++++++++++++++++++++++++++++"<<m_currentGroup<<m_currentNumberOfLesson;
+        createRandomLesson(m_currentNumberOfLesson);
+        ui->pushButton->clearFocus();
+    }
+        else
+    {
+        qDebug()<<"-------------------------------------------"<<m_currentGroup<<m_currentNumberOfLesson;
+        on_pushButton_released();
+     }
 }
 
 void Stamina::on_pushButton_released()
 {
+
+
     if( m_lessonStarted )
     {
         this->endLesson();
     } else {
         if( m_lessonLoaded )
         {
+          {
             m_lessonStarted = true;
             m_textfield->start();
             ui->pushButton->setText(tr("Stop"));
             m_timer->start(1000);
             m_keyboard->updateKeyboard(m_textfield->nextSymbol());
+
+           }
+
         }
     }
-    ui->pushButton->clearFocus();
+   ui->pushButton->clearFocus();
 }
 
 void Stamina::aboutTriggered()

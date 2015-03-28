@@ -9,10 +9,10 @@ Config::Config() :
     m_separateKeyboard = m_settings->value("separateKeyboard",QVariant(false)).toBool();
     m_enableSound = m_settings->value("enableSound",QVariant(true)).toBool();
 
-    m_lastLayout = m_settings->value("lastLayout",QLocale::system().name()).toString();
-
-
-    loadLayouts();
+    m_lastLayout = m_settings->value("lastLayout",QVariant(QLocale::system().name()).toString()).toString();
+   loadLayouts();
+   m_lastNumber = m_settings->value("number",QVariant(0)).toInt();
+   m_lastGroup= m_settings->value("group",QVariant("other")).toString();
 }
 
 Config::~Config()
@@ -182,7 +182,7 @@ void Config::loadLessons()
             lesson->version = jsonArray.at(i).toObject().value("version").toString();
             lesson->content = jsonArray.at(i).toObject().value("content").toString();
             lesson->group = jsonArray.at(i).toObject().value("group").toString();
-
+            lesson->number=i;
             m_lessons.append(lesson);
         }
         if( m_lessons.count() < 1 )
@@ -205,14 +205,16 @@ void Config::loadGeneratedLessons()
     {
         QJsonDocument jsonDoc = QJsonDocument::fromJson(lessonsFile.readAll());
         QJsonArray jsonArray = jsonDoc.array();
+        qDebug()<<"jsonarraycount="<<jsonArray.count();
         for( int i = 0; i < jsonArray.count(); i++ )
         {
+
             Lesson *lesson = new Lesson;
             lesson->title = jsonArray.at(i).toObject().value("title").toString();
             lesson->author = "lessons generator";
             lesson->version = "0.0.0";
             lesson->content = jsonArray.at(i).toObject().value("content").toString();
-
+            lesson->number=i;
             m_generatedLessons.append(lesson);
         }
         if( m_generatedLessons.count() < 1 )
@@ -230,6 +232,27 @@ void Config::clearLessons()
 {
     m_lessons.clear();
 }
+void Config::setLastLesson(QString group,int number)
+{
+    m_lastGroup=group;
+    m_lastNumber=number;
+    m_settings->setValue("group",group);
+    m_settings->setValue("number",number);
+}
+ Lesson *Config::getLastLesson(QString group, int number)
+ {
+     Lesson *currentLesson;
+     if(lessons().lessonsByGroup(group).size()>number)
+     {
+         currentLesson=lessons().lessonsByGroup(group).at(number);
+         currentLesson->number=number;
+         return currentLesson;
+      }
+       else {
+                qDebug()<<"NULL number="<<number<<"lessonsByGroup(group).size()"<<lessons().lessonsByGroup(group).size();
+                return NULL;
+            }
+ }
 
 void Config::clearGeneratedLessons()
 {

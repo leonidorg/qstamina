@@ -11,7 +11,6 @@ void Markchain::clear()
 {
     m_chain.clear();
     m_store.clear();
-
 }
 void Markchain::rand()
 {
@@ -29,10 +28,7 @@ void Markchain::load(QString layout)
     QSettings *readData;
     //readData=new QSettings(qApp->applicationName(),layout);
     readData=new QSettings(":/resources/generatorRules/"+layout+".rnd", QSettings::IniFormat);
-    if(readData->allKeys().isEmpty())
-        qDebug()<<"увы !!!";
-    else
-        qDebug()<<"loading: readdata from:"<<readData->fileName();
+     qDebug()<<"loading: readdata from:"<<readData->fileName();
     QStringList keys = readData->allKeys();
 
     foreach(QString key, keys)
@@ -88,9 +84,12 @@ QString Markchain::lower(QString ch,bool isAdvance)
 return result;
 }
 
-QString Markchain::chapper(QChar start, int length,bool isAdvanced)
+QString Markchain::chapper(QString start, int length,bool isAdvanced)
 {
-    QChar key=start;
+        QChar key;
+        if(!start.isEmpty()) key=start.at(0);
+        else
+        key=' ';
         QString sKey, sNum;
         sKey.clear();
         sKey.append(key);
