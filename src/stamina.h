@@ -53,6 +53,7 @@
 #include "markchain.h"
 #include "myinlinefield.h"
 #include "lessontimer.h"
+const int PAUSECONST=5;
 namespace Ui {
 class Stamina;
 }
@@ -92,6 +93,7 @@ private:
     int m_typeLastSecond;
     float m_speed;
     QTimer *m_timer;
+    QTimer *run_timer;
     QMenuBar *m_mainMenu;
     Markchain *m_chain;
     bool m_lessonLoaded;
@@ -102,13 +104,16 @@ private:
     QList<float> m_avgSpeedBySecond;
     int  m_timeLesson;
     LessonTimer *m_lessonTimer;
+    int m_freqPress;
 private slots:
     int timeLesson() const {return m_timeLesson;}
     void lessonChoosed();
     void generatedlessonChoosed();
     void layoutChoosed();
     void timeout();
+    void runStep();
     void on_pushButton_released();
+    void pushClick();
     void aboutTriggered();
     void settingsTriggered();
     void settingsSaved();
@@ -116,7 +121,11 @@ private slots:
     void myRandomLessonChoosed();
     void myRandomLessonChoosed1();
     void createTextLesson();
-  public slots:
+    void on_radioButton_toggled(bool checked);
+
+    void on_radioButton_released();
+
+public slots:
     void getMoreText();
 };
 
