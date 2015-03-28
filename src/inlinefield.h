@@ -40,9 +40,10 @@ public:
     void setFontPixelSize(int);
 protected:
     virtual void resizeEvent(QResizeEvent *);
-private:
     QLabel *m_newText;
     QLabel *m_oldText;
+private:
+
     QHBoxLayout *m_layout;
 
 };
