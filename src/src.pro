@@ -41,7 +41,8 @@ SOURCES += main.cpp\
     lessonslist.cpp \
     sounds.cpp \
     markchain.cpp \
-    intlist.cpp
+    intlist.cpp \
+    myinlinefield.cpp
 
 HEADERS  += stamina.h \
     results.h \
@@ -55,7 +56,8 @@ HEADERS  += stamina.h \
     lessonslist.h \
     sounds.h \
     markchain.h \
-    intlist.h
+    intlist.h \
+    myinlinefield.h
 
 FORMS    += stamina.ui \
     results.ui \

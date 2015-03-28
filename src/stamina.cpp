@@ -41,8 +41,15 @@ qDebug()<<"savedgroup="<<m_currentGroup<<"savedNumber="<<m_currentNumberOfLesson
 
     QVBoxLayout *layout = new QVBoxLayout(ui->frameTextField);
     ui->frameTextField->setLayout(layout);
-    InlineField *inlineField = new InlineField( m_sounds, ui->frameTextField );
-    m_textfield = dynamic_cast< TextField* >(inlineField);
+
+    //InlineField *inlineField = new InlineField( m_sounds, ui->frameTextField );
+    //m_textfield = dynamic_cast< TextField* >(inlineField);
+
+
+    MyInlineField *myInlineField = new MyInlineField( m_sounds, ui->frameTextField );
+    m_textfield = dynamic_cast< InlineField* >(myInlineField);
+
+
     layout->addWidget(m_textfield);
     connect(m_textfield,SIGNAL(noMoreText()),this,SLOT(getMoreText()));
 
@@ -308,9 +315,9 @@ void Stamina::timeout()
     m_speedBySecond.append(m_textfield->rightSymbols() - m_typeLastSecond);
     m_avgSpeedBySecond.append(m_textfield->rightSymbols() / m_time);
     m_typeLastSecond = m_textfield->rightSymbols();
-    //qDebug()<<this->speed;
     QString speed;
     speed.setNum(m_speed);
+    qDebug()<<speed;
     QTime time;
     time.setHMS(0,0,0,0);
     time = time.addSecs(m_time);
@@ -358,7 +365,7 @@ void Stamina::createRandomLesson(int isAdvance)
         newLesson->title="Random";
         newLesson->group="random";
         newLesson->number=isAdvance;//хранит значение сложности.
-        newLesson->content=m_chain->chapper(m_textfield->nextSymbol(),100,isAdvance);
+        newLesson->content=m_chain->chapper(m_textfield->lastSymbol(),100,isAdvance);
         loadLesson( newLesson );
 
 }
