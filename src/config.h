@@ -42,7 +42,8 @@ public:
     bool enableSound() const;
     void setSeparateKeyboard(bool separateKeyboard);
     void setEnableSound(bool enableSound);
-
+    bool enableTikTak()const {return true;};
+    int  interval()const{return 1000;}
     QString resourcesPath();
 
     QString lastLayout() const;
