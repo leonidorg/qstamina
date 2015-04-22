@@ -34,14 +34,14 @@ public:
     InlineField(Sounds *sounds, QWidget *parent = 0);
     void keyPressed(QString key);
     void setText(QString text);
-
+    void stop();
     QString nextSymbol();
     void reset();
     void setFontPixelSize(int);
 protected:
     virtual void resizeEvent(QResizeEvent *);
-    QLabel *m_newText;
-    QLabel *m_oldText;
+     QLabel *m_newText;
+     QLabel *m_oldText;
 private:
 
     QHBoxLayout *m_layout;

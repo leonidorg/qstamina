@@ -123,10 +123,7 @@ QString Markchain::chapper(QString start, int length,bool isAdvanced)
             int len=m_chain[key].size();
             sNum.setNum(len);
             last=getRandomNo(0, m_chain[key].count()-1);
-            //qDebug()<<"last["<<key<<"]="<<last;
-
             next=m_store[key].at(m_chain[key].at(last));
-            //qDebug()<<"verseQ"<<result.size()<<"count="<<m_chain[key].count()<<"last="<<last<<"next="<<next;
             key=next.at(next.size()-1);
             if(!next.isEmpty())
             {
@@ -138,5 +135,5 @@ QString Markchain::chapper(QString start, int length,bool isAdvanced)
 
         } while((result.size()<length)&&(!result.isEmpty()));
         qDebug()<<"RandomString: "<<result;
-        return result.simplified();
+        return result/*.simplified()*/;
 }

@@ -15,5 +15,6 @@
         <file>resources/sounds/Ow_Vinni.wav</file>
         <file>resources/sounds/Click.wav</file>
         <file>resources/sounds/finish.wav</file>
+        <file>resources/sounds/itemback.wav</file>
     </qresource>
 </RCC>

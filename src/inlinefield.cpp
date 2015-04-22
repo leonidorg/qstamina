@@ -63,7 +63,10 @@ InlineField::InlineField(Sounds *sounds, QWidget *parent) :
 
     this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 }
-
+void InlineField::stop()
+{
+ m_newText->setText(" ");
+}
 void InlineField::keyPressed(QString key)
 {
     //qDebug()<<"InlineField::keyPressed: "<<key;

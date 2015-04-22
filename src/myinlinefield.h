@@ -11,6 +11,7 @@ public:
     void reset();
     void start();
     void stop();
+
 };
 
 #endif // MYINLINEFIELD_H

@@ -10,9 +10,11 @@ Config::Config() :
     m_enableSound = m_settings->value("enableSound",QVariant(true)).toBool();
 
     m_lastLayout = m_settings->value("lastLayout",QVariant(QLocale::system().name()).toString()).toString();
-   loadLayouts();
+
    m_lastNumber = m_settings->value("number",QVariant(0)).toInt();
    m_lastGroup= m_settings->value("group",QVariant("other")).toString();
+   m_lastGroupNumber=m_settings->value("groupNumber",QVariant(0)).toInt();
+   loadLayouts();
 }
 
 Config::~Config()
@@ -243,6 +245,10 @@ void Config::setLastLesson(QString group,int number)
     m_lastNumber=number;
     m_settings->setValue("group",group);
     m_settings->setValue("number",number);
+    m_lastGroupNumber=lessons().groups().indexOf(group);
+    if (m_lastGroupNumber<0) m_lastGroupNumber=0;
+    m_settings->setValue("groupNumber",m_lastGroupNumber);
+
 }
  Lesson *Config::getLastLesson(QString group, int number)
  {
@@ -254,8 +260,10 @@ void Config::setLastLesson(QString group,int number)
          return currentLesson;
       }
        else {
-                qDebug()<<"NULL number="<<number<<"lessonsByGroup(group).size()"<<lessons().lessonsByGroup(group).size();
-                return NULL;
+         QString firstGroup=this->lessons().groups().at(0);
+         currentLesson=lessons().lessonsByGroup(firstGroup).at(0);
+         currentLesson->number=number;
+         return currentLesson;
             }
  }
 

@@ -42,7 +42,7 @@ public:
     bool enableSound() const;
     void setSeparateKeyboard(bool separateKeyboard);
     void setEnableSound(bool enableSound);
-    bool enableTikTak()const {return true;};
+    bool enableTikTak()const {return true;}
     int  interval()const{return 1000;}
     QString resourcesPath();
 
@@ -54,6 +54,7 @@ public:
     Lesson * getLastLesson(QString group,int number);
     QString lastGroup() const{return m_lastGroup;}
     int lastNumber() const{return m_lastNumber;}
+    int lastGroupNumber() const {return m_lastGroupNumber;}
     void setLastLesson(QString group,int number);
     QList<Layout *> layouts() const;
     LessonsList lessons() const;
@@ -71,6 +72,7 @@ private:
     Layout *m_currentLayout;
     QString m_lastGroup;
     int m_lastNumber;
+    int m_lastGroupNumber;
 
     LessonsList m_lessons;
     QList<Lesson*> m_generatedLessons;

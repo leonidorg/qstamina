@@ -32,7 +32,7 @@ MyInlineField::~MyInlineField()
  }
 
  void MyInlineField::reset()
- {
+ {  qDebug()<<"reset()"<<m_newText->text();
      m_oldText->setText(m_oldText->text().right(40));
      m_newText->setText(m_text);
      m_countSymbols = m_text.size();

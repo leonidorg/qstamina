@@ -32,6 +32,7 @@ void TextField::keyPressed(QString)
 {
 }
 
+
 void TextField::setText(QString)
 {
 }
@@ -51,6 +52,7 @@ void TextField::start()
 
 void TextField::stop()
 {
+
 }
 
 

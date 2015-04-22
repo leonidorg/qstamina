@@ -35,8 +35,8 @@ Stamina::Stamina(QWidget *parent) :
     m_chain = new Markchain(this);
     m_currentGroup=m_config->lastGroup();
     m_currentNumberOfLesson=m_config->lastNumber();
-
-qDebug()<<"savedgroup="<<m_currentGroup<<"savedNumber="<<m_currentNumberOfLesson;
+    m_currentNumberOfGroup=m_config->lastGroupNumber();
+    qDebug()<<"savedgroup="<<m_currentGroup<<"savedNumber="<<m_currentNumberOfLesson;
     QDir storage;
     storage.mkpath(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/generatedLessons");
 
@@ -184,21 +184,14 @@ void Stamina::loadLessonsMenu()
 
 void Stamina::loadLesson(Lesson *lesson)
 {
-    ui->radioButton->setChecked(true);
-     if (!ui->radioButton->isChecked())
-                        ui->radioButton->setChecked(true);//снятие паузы, если она была установлена}
-
-    //    if( m_lessonStarted )
-    //        this->endLesson();
-    qDebug()<<"loading lesson: group="<<lesson->group<<"["<<lesson->number<<"]"<<lesson->title;
-
+    qDebug()<<"loading lesson:"<<m_textfield->rightSymbols();
+    m_currentGroup=lesson->group;
+    m_currentNumberOfLesson=lesson->number;
     m_textfield->setText(lesson->content);
     ui->lblLesson->setText(lesson->title);
     m_lessonLoaded = true;
     m_currentGroup =lesson->group;
-    m_currentNumberOfGroup=m_config->lessons().groups().indexOf(m_currentGroup);
-    if(m_currentNumberOfGroup<0)m_currentNumberOfGroup=0;
-    m_currentNumberOfLesson=lesson->number;
+
     //сохраняем текущий урок.
 
     m_config->setLastLesson(m_currentGroup,m_currentNumberOfLesson);
@@ -207,7 +200,6 @@ void Stamina::loadLesson(Lesson *lesson)
 void Stamina::reset()
 {
 
-qDebug()<<"RESET:savedgroup="<<m_currentGroup<<"savedNumber="<<m_currentNumberOfLesson;
 if (m_currentGroup=="random")
     createRandomLesson(m_currentNumberOfLesson);
 else
@@ -223,10 +215,14 @@ else
 
 
 else
-  {
-        m_currentNumberOfGroup=m_config->lessons().groups().indexOf(m_currentGroup);
-        if(m_currentNumberOfGroup<0)
-            m_currentNumberOfLesson=0;
+  {     int currentNumberOfGroup=m_config->lessons().groups().indexOf(m_currentGroup);
+            if(currentNumberOfGroup<0)
+              {
+                m_currentNumberOfLesson=0;
+                if((m_currentNumberOfGroup>0)&&(m_currentNumberOfGroup<m_config->lessons().groups().size()))
+                m_currentGroup=m_config->lessons().groups().at( m_currentNumberOfGroup);
+              }
+
         Lesson *baseLesson=m_config->getLastLesson(m_currentGroup,m_currentNumberOfLesson);
         if(baseLesson)
         {
@@ -240,9 +236,6 @@ else
 }
 void Stamina::loadCurrentLayout()
 { qDebug()<<"loadingCurrentLayout";
-//    if( m_lessonStarted )
-//        this->endLesson();
-
     ui->lblLesson->setText("   ");
     m_textfield->setText("");
     ui->lblLayout->setText(m_config->currentLayout()->title);
@@ -315,6 +308,7 @@ void Stamina::generatedlessonChoosed()
 
 void Stamina::layoutChoosed()
 {
+    m_textfield->setText("");
     QAction *action = (QAction*)sender();
     if( m_config->setCurrentLayout(action->data().toInt()) )
     {
@@ -327,6 +321,9 @@ void Stamina::timeout()
     bool out;
     out= (!ui->lblTimer->isActiveWindow())||(m_freqPress>PAUSECONST);
     if(m_lessonStarted) ui->radioButton->setChecked(!out);
+   // ui->lblTimer->setFocus();
+
+
     if (!ui->radioButton->isChecked())return;
 
     m_time++;
@@ -386,6 +383,7 @@ void Stamina::createTextLesson()
 
 }
 
+
 void Stamina::createRandomLesson(int isAdvance)
 {
 
@@ -435,15 +433,12 @@ void Stamina::getMoreText()
 {
     if(m_currentGroup=="random")
     {
-        //qDebug()<<"++++++++++++++++++++++++++++++++++++++++++++++"<<m_currentGroup<<m_currentNumberOfLesson;
         createRandomLesson(m_currentNumberOfLesson);
         ui->pushButton->clearFocus();
-        ui->radioButton->setFocus();
+        ui->lblTimer->setFocus();
     }
         else
     {
-        //qDebug()<<"-------------------------------------------"<<m_currentGroup<<m_currentNumberOfLesson;
-        //on_pushButton_released();
         pushClick();
      }
 }
@@ -451,13 +446,8 @@ void Stamina::runStep()
 {
 
     if( m_lessonStarted )
-       {
-           m_freqPress++;
-           if(m_freqPress>PAUSECONST)
-                          ui->radioButton->setChecked(false);
-       }
-
-       if (!ui->radioButton->isChecked())return;//во время паузы -пауза бегущей строки и звука метронома.
+                 m_freqPress++;
+   if (!ui->radioButton->isChecked())return;//во время паузы -запрет звука метронома.
 
     if(m_config->enableTikTak())//молчание по запрету настроек
        m_sounds->play("metronome");
@@ -537,6 +527,14 @@ void Stamina::generatorTriggered()
 void Stamina::on_radioButton_toggled(bool checked)
 {
     ui->pause_Label->setVisible(!checked);
+    ui->lblTimer->setFocus();
+// if(!checked)
+//        ui->radioButton->setFocus();
+//    else
+//    {
+//         ui->radioButton->clearFocus();
+//         ui->lblTimer->setFocus();
+//    }
 }
 
 void Stamina::on_radioButton_released()
